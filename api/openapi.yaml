@@ -86,4 +86,8 @@ components:
         DATA:
           description: Used for action-specific data such as status reports
           type: string
+        ADIF:
+          description: ADIF data containing the QSO’s that match the selection criteria,
+            limited by the MAX parameter.
+          type: string
       type: object
