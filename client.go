@@ -40,6 +40,7 @@ import (
 var (
 	jsonCheck = regexp.MustCompile(`(?i:(?:application|text)/(?:vnd\.[^;]+\+)?json)`)
 	xmlCheck  = regexp.MustCompile(`(?i:(?:application|text)/xml)`)
+	formCheck = regexp.MustCompile(`(?i:(?:application|text)/(?:html|x-www-form-urlencoded))`)
 )
 
 // APIClient manages communication with the QRZ Logbook API API v1.0.0
@@ -376,6 +377,12 @@ func (c *APIClient) decode(v interface{}, b []byte, contentType string) (err err
 		_, err = (*f).Write(b)
 		_, err = (*f).Seek(0, io.SeekStart)
 		return
+	}
+	if formCheck.MatchString(contentType) {
+		if err = unmarshalForm(b, v); err != nil {
+			return err
+		}
+		return nil
 	}
 	if xmlCheck.MatchString(contentType) {
 		if err = xml.Unmarshal(b, v); err != nil {
