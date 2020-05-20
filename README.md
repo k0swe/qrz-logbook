@@ -32,7 +32,7 @@ All URIs are relative to *https://logbook.qrz.com/api*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*DefaultApi* | [**DoEverything**](docs/DefaultApi.md#doeverything) | **Post** / | The do-everything endpoint
+*DefaultApi* | [**RootPost**](docs/DefaultApi.md#rootpost) | **Post** / | The do-everything endpoint
 
 
 ## Documentation For Models

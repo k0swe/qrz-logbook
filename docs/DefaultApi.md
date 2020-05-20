@@ -4,13 +4,13 @@ All URIs are relative to *https://logbook.qrz.com/api*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**DoEverything**](DefaultApi.md#DoEverything) | **Post** / | The do-everything endpoint
+[**RootPost**](DefaultApi.md#RootPost) | **Post** / | The do-everything endpoint
 
 
 
-## DoEverything
+## RootPost
 
-> Response DoEverything(ctx, kEY, aCTION, optional)
+> Response RootPost(ctx, kEY, aCTION, optional)
 
 The do-everything endpoint
 
@@ -22,11 +22,11 @@ Name | Type | Description  | Notes
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
 **kEY** | **string**| A QRZ supplied logbook access key | 
 **aCTION** | **string**| Type of request, i.e. INSERT, DELETE, UPLOAD, etc. | 
- **optional** | ***DoEverythingOpts** | optional parameters | nil if no parameters
+ **optional** | ***RootPostOpts** | optional parameters | nil if no parameters
 
 ### Optional Parameters
 
-Optional parameters are passed through a pointer to a DoEverythingOpts struct
+Optional parameters are passed through a pointer to a RootPostOpts struct
 
 
 Name | Type | Description  | Notes

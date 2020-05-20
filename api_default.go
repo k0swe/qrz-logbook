@@ -27,25 +27,25 @@ var (
 // DefaultApiService DefaultApi service
 type DefaultApiService service
 
-// DoEverythingOpts Optional parameters for the method 'DoEverything'
-type DoEverythingOpts struct {
+// RootPostOpts Optional parameters for the method 'RootPost'
+type RootPostOpts struct {
 	ADIF   optional.String
 	OPTION optional.String
 	LOGIDS optional.String
 }
 
 /*
-DoEverything The do-everything endpoint
+RootPost The do-everything endpoint
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param kEY A QRZ supplied logbook access key
  * @param aCTION Type of request, i.e. INSERT, DELETE, UPLOAD, etc.
- * @param optional nil or *DoEverythingOpts - Optional Parameters:
+ * @param optional nil or *RootPostOpts - Optional Parameters:
  * @param "ADIF" (optional.String) -  ADIF formatted input data
  * @param "OPTION" (optional.String) -  Action-specific options
  * @param "LOGIDS" (optional.String) -  A comma separated list of integer logid values
 @return Response
 */
-func (a *DefaultApiService) DoEverything(ctx _context.Context, kEY string, aCTION string, localVarOptionals *DoEverythingOpts) (Response, *_nethttp.Response, error) {
+func (a *DefaultApiService) RootPost(ctx _context.Context, kEY string, aCTION string, localVarOptionals *RootPostOpts) (Response, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
