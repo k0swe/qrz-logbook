@@ -5,6 +5,7 @@ import (
 	"fmt"
 	ql "github.com/xylo04/qrz-logbook"
 	"os"
+	"strings"
 )
 
 func main() {
@@ -15,10 +16,19 @@ func main() {
 		os.Exit(1)
 	}
 
-	lookupResp, err := ql.Fetch(key)
+	status, err := ql.Status(key)
 	if err != nil {
 		_, _ = fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	println("That logbook has", lookupResp.COUNT, "records")
+	println("The logbook is called", status.BookName)
+
+	fetch, err2 := ql.Fetch(key)
+	if err2 != nil {
+		_, _ = fmt.Fprintln(os.Stderr, err2)
+		os.Exit(1)
+	}
+	println("The logbook is has", fetch.Count, "records")
+	lines := strings.Count(fetch.Adif, "\n") + 1
+	println("The ADIF is has", lines, "lines")
 }

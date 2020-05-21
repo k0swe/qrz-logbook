@@ -10,7 +10,6 @@ Name | Type | Description | Notes
 **LOGID** | **string** | The logid value of the record that was inserted or replaced. (Singular \&quot;LOGID\&quot; response only used by INSERT as it is a single record operation.) | [optional] 
 **COUNT** | **string** | The number of QSO records that were affected by the action | [optional] 
 **DATA** | **string** | Used for action-specific data such as status reports | [optional] 
-**ADIF** | **string** | ADIF data containing the QSO’s that match the selection criteria, limited by the MAX parameter. | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

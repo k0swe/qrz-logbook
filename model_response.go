@@ -25,6 +25,4 @@ type Response struct {
 	COUNT string `json:"COUNT,omitempty"`
 	// Used for action-specific data such as status reports
 	DATA string `json:"DATA,omitempty"`
-	// ADIF data containing the QSO’s that match the selection criteria, limited by the MAX parameter.
-	ADIF string `json:"ADIF,omitempty"`
 }
