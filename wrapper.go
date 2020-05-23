@@ -2,6 +2,8 @@ package qrzlog
 
 import (
 	"context"
+	"errors"
+	"github.com/antihax/optional"
 	"regexp"
 	"strconv"
 	"strings"
@@ -30,6 +32,10 @@ func Fetch(key *string) (*FetchResponse, error) {
 		Result: apiResp.RESULT,
 		Count:  count,
 		Adif:   adif,
+	}
+	if apiResp.RESULT == "FAIL" && apiResp.REASON != "" {
+		// having a logbook with 0 QSOs will always result in a FAIL
+		err = errors.New(apiResp.REASON)
 	}
 	return &r, err
 }
@@ -76,6 +82,71 @@ func Status(key *string) (*StatusResponse, error) {
 
 	// Put this at the end because it's the least strict regex
 	findField(&apiResp.DATA, regexp.MustCompile(`(^|&)BOOK_NAME=(.*)`), &r.BookName)
+	if apiResp.RESULT == "FAIL" && apiResp.REASON != "" {
+		err = errors.New(apiResp.REASON)
+	}
+	return &r, err
+}
+
+type InsertResponse struct {
+	Count  uint64
+	Result string
+	LogId  string
+}
+
+func Insert(key *string, adif string, replace bool) (*InsertResponse, error) {
+	client := newClient()
+	opts := RootPostOpts{
+		ADIF: optional.NewString(adif),
+	}
+	if replace {
+		opts.OPTION = optional.NewString("REPLACE")
+	}
+	apiResp, _, err := client.DefaultApi.RootPost(context.TODO(), *key, "INSERT", &opts)
+	if err != nil {
+		return nil, err
+	}
+
+	count, _ := strconv.ParseUint(apiResp.COUNT, 10, 64)
+	r := InsertResponse{
+		Result: apiResp.RESULT,
+		LogId:  apiResp.LOGID,
+		Count:  count,
+	}
+	if apiResp.RESULT == "FAIL" && apiResp.REASON != "" {
+		err = errors.New(apiResp.REASON)
+	}
+	return &r, err
+}
+
+type DeleteResponse struct {
+	Count  uint64
+	Result string
+	// The log IDs which were not deleted; Result will be PARTIAL
+	LogIds  []string
+}
+
+func Delete(key *string, ids []string) (*DeleteResponse, error) {
+	client := newClient()
+	idsSlice := strings.Join(ids, ",")
+	opts := RootPostOpts{
+		LOGIDS: optional.NewString(idsSlice),
+	}
+	apiResp, _, err := client.DefaultApi.RootPost(context.TODO(), *key, "DELETE", &opts)
+	if err != nil {
+		return nil, err
+	}
+
+	count, _ := strconv.ParseUint(apiResp.COUNT, 10, 64)
+	notDeleted := strings.Split(apiResp.LOGIDS, ",")
+	r := DeleteResponse{
+		Result: apiResp.RESULT,
+		LogIds:  notDeleted,
+		Count:  count,
+	}
+	if apiResp.RESULT == "FAIL" && apiResp.REASON != "" {
+		err = errors.New(apiResp.REASON)
+	}
 	return &r, err
 }
 
