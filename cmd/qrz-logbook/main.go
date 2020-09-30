@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	ql "github.com/xylo04/qrz-logbook"
+	ql "github.com/k0swe/qrz-logbook"
 	"os"
 	"strconv"
 	"strings"

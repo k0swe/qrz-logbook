@@ -1,4 +1,4 @@
-module github.com/xylo04/qrz-logbook
+module github.com/k0swe/qrz-logbook
 
 go 1.14
 
