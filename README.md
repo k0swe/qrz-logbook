@@ -1,3 +1,5 @@
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/k0swe/qrz-logbook)](https://pkg.go.dev/github.com/k0swe/qrz-logbook)
+
 # Go API client for qrzlog
 
 This API provides methods for external programs to interact with the QRZ Logbook using an HTTP REST interface. The QRZ Logbook is a combination free and paid subscription service of QRZ. Some advanced features require a valid subscription while the majority of operations are free to all QRZ members. All users of the QRZ Logbook, regardless of their subscription status, may access, edit, update, and view their complete logs online at the QRZ website.
