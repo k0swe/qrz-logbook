@@ -1,4 +1,5 @@
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/k0swe/qrz-logbook)](https://pkg.go.dev/github.com/k0swe/qrz-logbook)
+[![Go Report Card](https://goreportcard.com/badge/github.com/k0swe/qrz-logbook)](https://goreportcard.com/report/github.com/k0swe/qrz-logbook)
 
 # Go API client for qrzlog
 
