@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-const agent = "xylo-go-1.0"
+const agent = "k0swe-go-1.0"
 
 type FetchResponse struct {
 	Adif   string
@@ -17,10 +17,10 @@ type FetchResponse struct {
 	Result string
 }
 
-func Fetch(key *string) (*FetchResponse, error) {
+func Fetch(ctx context.Context, key *string) (*FetchResponse, error) {
 	client := newClient()
 	opts := RootPostOpts{}
-	apiResp, _, err := client.DefaultApi.RootPost(context.TODO(), *key, "FETCH", &opts)
+	apiResp, _, err := client.DefaultApi.RootPost(ctx, *key, "FETCH", &opts)
 	if err != nil {
 		return nil, err
 	}
@@ -54,10 +54,10 @@ type StatusResponse struct {
 	StartDate string
 }
 
-func Status(key *string) (*StatusResponse, error) {
+func Status(ctx context.Context, key *string) (*StatusResponse, error) {
 	client := newClient()
 	opts := RootPostOpts{}
-	apiResp, _, err := client.DefaultApi.RootPost(context.TODO(), *key, "STATUS", &opts)
+	apiResp, _, err := client.DefaultApi.RootPost(ctx, *key, "STATUS", &opts)
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +94,7 @@ type InsertResponse struct {
 	LogId  string
 }
 
-func Insert(key *string, adif string, replace bool) (*InsertResponse, error) {
+func Insert(ctx context.Context, key *string, adif string, replace bool) (*InsertResponse, error) {
 	client := newClient()
 	opts := RootPostOpts{
 		ADIF: optional.NewString(adif),
@@ -102,7 +102,7 @@ func Insert(key *string, adif string, replace bool) (*InsertResponse, error) {
 	if replace {
 		opts.OPTION = optional.NewString("REPLACE")
 	}
-	apiResp, _, err := client.DefaultApi.RootPost(context.TODO(), *key, "INSERT", &opts)
+	apiResp, _, err := client.DefaultApi.RootPost(ctx, *key, "INSERT", &opts)
 	if err != nil {
 		return nil, err
 	}
@@ -123,16 +123,16 @@ type DeleteResponse struct {
 	Count  uint64
 	Result string
 	// The log IDs which were not deleted; Result will be PARTIAL
-	LogIds  []string
+	LogIds []string
 }
 
-func Delete(key *string, ids []string) (*DeleteResponse, error) {
+func Delete(ctx context.Context, key *string, ids []string) (*DeleteResponse, error) {
 	client := newClient()
 	idsSlice := strings.Join(ids, ",")
 	opts := RootPostOpts{
 		LOGIDS: optional.NewString(idsSlice),
 	}
-	apiResp, _, err := client.DefaultApi.RootPost(context.TODO(), *key, "DELETE", &opts)
+	apiResp, _, err := client.DefaultApi.RootPost(ctx, *key, "DELETE", &opts)
 	if err != nil {
 		return nil, err
 	}
@@ -141,7 +141,7 @@ func Delete(key *string, ids []string) (*DeleteResponse, error) {
 	notDeleted := strings.Split(apiResp.LOGIDS, ",")
 	r := DeleteResponse{
 		Result: apiResp.RESULT,
-		LogIds:  notDeleted,
+		LogIds: notDeleted,
 		Count:  count,
 	}
 	if apiResp.RESULT == "FAIL" && apiResp.REASON != "" {
