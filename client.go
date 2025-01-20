@@ -41,6 +41,8 @@ var (
 	jsonCheck = regexp.MustCompile(`(?i:(?:application|text)/(?:vnd\.[^;]+\+)?json)`)
 	xmlCheck  = regexp.MustCompile(`(?i:(?:application|text)/xml)`)
 	formCheck = regexp.MustCompile(`(?i:(?:application|text)/(?:html|x-www-form-urlencoded))`)
+	// k0swe customizations
+	textPlainCheck = regexp.MustCompile(`(?i:(?:text/plain))`)
 )
 
 // APIClient manages communication with the QRZ Logbook API API v1.0.0
@@ -396,7 +398,14 @@ func (c *APIClient) decode(v interface{}, b []byte, contentType string) (err err
 		}
 		return nil
 	}
-	return errors.New("undefined response type")
+	// k0swe customizations
+	if textPlainCheck.MatchString(contentType) {
+		if err = unmarshalForm(b, v); err != nil {
+			return err
+		}
+		return nil
+	}
+	return errors.New("undefined response type " + contentType)
 }
 
 // Add a file to the multipart request
