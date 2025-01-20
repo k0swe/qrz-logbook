@@ -1,4 +1,2 @@
 packageName: qrzlog
 withGoCodegenComment: true
-globalProperties:
-  skipFormModel: false

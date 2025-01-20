@@ -26,6 +26,3 @@ _testmain.go
 # IDE files
 *.iml
 .idea/
-
-.travis.yml
-git_push.sh

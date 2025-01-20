@@ -3,6 +3,7 @@ package qrzlog
 import (
 	"context"
 	"errors"
+	"github.com/antihax/optional"
 	"regexp"
 	"strconv"
 	"strings"
@@ -18,23 +19,23 @@ type FetchResponse struct {
 
 func Fetch(ctx context.Context, key *string) (*FetchResponse, error) {
 	client := newClient()
-	req := client.DefaultAPI.RootPost(ctx).KEY(*key).ACTION("FETCH")
-	apiResp, _, err := req.Execute()
+	opts := RootPostOpts{}
+	apiResp, _, err := client.DefaultApi.RootPost(ctx, *key, "FETCH", &opts)
 	if err != nil {
 		return nil, err
 	}
-	count, _ := strconv.ParseUint(*apiResp.COUNT, 10, 64)
-	adif := strings.Replace(*apiResp.DATA, "ADIF=", "", -1)
+	count, _ := strconv.ParseUint(apiResp.COUNT, 10, 64)
+	adif := strings.Replace(apiResp.DATA, "ADIF=", "", -1)
 	adif = strings.ReplaceAll(adif, "&lt;", "<")
 	adif = strings.ReplaceAll(adif, "&gt;", ">")
 	r := FetchResponse{
-		Result: *apiResp.RESULT,
+		Result: apiResp.RESULT,
 		Count:  count,
 		Adif:   adif,
 	}
-	if *apiResp.RESULT == "FAIL" && *apiResp.REASON != "" {
+	if apiResp.RESULT == "FAIL" && apiResp.REASON != "" {
 		// having a logbook with 0 QSOs will always result in a FAIL
-		err = errors.New(*apiResp.REASON)
+		err = errors.New(apiResp.REASON)
 	}
 	return &r, err
 }
@@ -55,34 +56,34 @@ type StatusResponse struct {
 
 func Status(ctx context.Context, key *string) (*StatusResponse, error) {
 	client := newClient()
-	req := client.DefaultAPI.RootPost(ctx).KEY(*key).ACTION("STATUS")
-	apiResp, _, err := req.Execute()
+	opts := RootPostOpts{}
+	apiResp, _, err := client.DefaultApi.RootPost(ctx, *key, "STATUS", &opts)
 	if err != nil {
 		return nil, err
 	}
-	count, _ := strconv.ParseUint(*apiResp.COUNT, 10, 64)
+	count, _ := strconv.ParseUint(apiResp.COUNT, 10, 64)
 	r := StatusResponse{
-		Result: *apiResp.RESULT,
+		Result: apiResp.RESULT,
 		Count:  count,
 	}
 
 	var confirmedStr, dxccCountStr string
-	findField(apiResp.DATA, regexp.MustCompile(`(^|&)CONFIRMED=([\d]*)`), &confirmedStr)
+	findField(&apiResp.DATA, regexp.MustCompile(`(^|&)CONFIRMED=([\d]*)`), &confirmedStr)
 	r.Confirmed, _ = strconv.ParseUint(confirmedStr, 10, 64)
-	findField(apiResp.DATA, regexp.MustCompile(`(^|&)DXCC_COUNT=(\d*)`), &dxccCountStr)
+	findField(&apiResp.DATA, regexp.MustCompile(`(^|&)DXCC_COUNT=(\d*)`), &dxccCountStr)
 	r.DxccCount, _ = strconv.ParseUint(dxccCountStr, 10, 64)
 
-	findField(apiResp.DATA, regexp.MustCompile(`(^|&)ACTION=(\w*)`), &r.Action)
-	findField(apiResp.DATA, regexp.MustCompile(`(^|&)BOOKID=(\d*)`), &r.BookId)
-	findField(apiResp.DATA, regexp.MustCompile(`(^|&)CALLSIGN=([\w-/]*)`), &r.Callsign)
-	findField(apiResp.DATA, regexp.MustCompile(`(^|&)END_DATE=([\d-]*)`), &r.EndDate)
-	findField(apiResp.DATA, regexp.MustCompile(`(^|&)OWNER=([\w-/]*)`), &r.Owner)
-	findField(apiResp.DATA, regexp.MustCompile(`(^|&)START_DATE=([\d-]*)`), &r.StartDate)
+	findField(&apiResp.DATA, regexp.MustCompile(`(^|&)ACTION=(\w*)`), &r.Action)
+	findField(&apiResp.DATA, regexp.MustCompile(`(^|&)BOOKID=(\d*)`), &r.BookId)
+	findField(&apiResp.DATA, regexp.MustCompile(`(^|&)CALLSIGN=([\w-/]*)`), &r.Callsign)
+	findField(&apiResp.DATA, regexp.MustCompile(`(^|&)END_DATE=([\d-]*)`), &r.EndDate)
+	findField(&apiResp.DATA, regexp.MustCompile(`(^|&)OWNER=([\w-/]*)`), &r.Owner)
+	findField(&apiResp.DATA, regexp.MustCompile(`(^|&)START_DATE=([\d-]*)`), &r.StartDate)
 
 	// Put this at the end because it's the least strict regex
-	findField(apiResp.DATA, regexp.MustCompile(`(^|&)BOOK_NAME=(.*)`), &r.BookName)
-	if *apiResp.RESULT == "FAIL" && *apiResp.REASON != "" {
-		err = errors.New(*apiResp.REASON)
+	findField(&apiResp.DATA, regexp.MustCompile(`(^|&)BOOK_NAME=(.*)`), &r.BookName)
+	if apiResp.RESULT == "FAIL" && apiResp.REASON != "" {
+		err = errors.New(apiResp.REASON)
 	}
 	return &r, err
 }
@@ -95,25 +96,25 @@ type InsertResponse struct {
 
 func Insert(ctx context.Context, key *string, adif string, replace bool) (*InsertResponse, error) {
 	client := newClient()
-	act := "INSERT"
-	if replace {
-		act = "REPLACE"
+	opts := RootPostOpts{
+		ADIF: optional.NewString(adif),
 	}
-	req := client.DefaultAPI.RootPost(ctx).KEY(*key).ACTION(act)
-	req.ADIF(adif)
-	apiResp, _, err := req.Execute()
+	if replace {
+		opts.OPTION = optional.NewString("REPLACE")
+	}
+	apiResp, _, err := client.DefaultApi.RootPost(ctx, *key, "INSERT", &opts)
 	if err != nil {
 		return nil, err
 	}
 
-	count, _ := strconv.ParseUint(*apiResp.COUNT, 10, 64)
+	count, _ := strconv.ParseUint(apiResp.COUNT, 10, 64)
 	r := InsertResponse{
-		Result: *apiResp.RESULT,
-		LogId:  *apiResp.LOGID,
+		Result: apiResp.RESULT,
+		LogId:  apiResp.LOGID,
 		Count:  count,
 	}
-	if *apiResp.RESULT == "FAIL" && *apiResp.REASON != "" {
-		err = errors.New(*apiResp.REASON)
+	if apiResp.RESULT == "FAIL" && apiResp.REASON != "" {
+		err = errors.New(apiResp.REASON)
 	}
 	return &r, err
 }
@@ -127,22 +128,24 @@ type DeleteResponse struct {
 
 func Delete(ctx context.Context, key *string, ids []string) (*DeleteResponse, error) {
 	client := newClient()
-	req := client.DefaultAPI.RootPost(ctx).KEY(*key).ACTION("DELETE")
-	req.LOGIDS(strings.Join(ids, ","))
-	apiResp, _, err := req.Execute()
+	idsSlice := strings.Join(ids, ",")
+	opts := RootPostOpts{
+		LOGIDS: optional.NewString(idsSlice),
+	}
+	apiResp, _, err := client.DefaultApi.RootPost(ctx, *key, "DELETE", &opts)
 	if err != nil {
 		return nil, err
 	}
 
-	count, _ := strconv.ParseUint(*apiResp.COUNT, 10, 64)
-	notDeleted := strings.Split(*apiResp.LOGIDS, ",")
+	count, _ := strconv.ParseUint(apiResp.COUNT, 10, 64)
+	notDeleted := strings.Split(apiResp.LOGIDS, ",")
 	r := DeleteResponse{
-		Result: *apiResp.RESULT,
+		Result: apiResp.RESULT,
 		LogIds: notDeleted,
 		Count:  count,
 	}
-	if *apiResp.RESULT == "FAIL" && *apiResp.REASON != "" {
-		err = errors.New(*apiResp.REASON)
+	if apiResp.RESULT == "FAIL" && apiResp.REASON != "" {
+		err = errors.New(apiResp.REASON)
 	}
 	return &r, err
 }

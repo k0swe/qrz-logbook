@@ -2,8 +2,7 @@ openapi: 3.0.1
 info:
   contact:
     email: flloyd@qrz.com
-  description: |
-    This API provides methods for external programs to interact with the
+  description: This API provides methods for external programs to interact with the
     QRZ Logbook using an HTTP REST interface. The QRZ Logbook is a combination free
     and paid subscription service of QRZ. Some advanced features require a valid subscription
     while the majority of operations are free to all QRZ members. All users of the
@@ -15,7 +14,7 @@ externalDocs:
   description: Prose API description
   url: http://files.qrz.com/static/qrz/The%20QRZ%20Logbook%20API.pdf
 servers:
-  - url: https://logbook.qrz.com/api
+- url: https://logbook.qrz.com/api
 paths:
   /:
     post:
@@ -24,14 +23,14 @@ paths:
         content:
           application/x-www-form-urlencoded:
             schema:
-              $ref: "#/components/schemas/Request"
+              $ref: '#/components/schemas/Request'
         required: true
       responses:
         "200":
           content:
             application/x-www-form-urlencoded:
               schema:
-                $ref: "#/components/schemas/Response"
+                $ref: '#/components/schemas/Response'
           description: OK
       summary: The do-everything endpoint
 components:
@@ -42,12 +41,12 @@ components:
           description: A QRZ supplied logbook access key
           type: string
         ACTION:
-          description: "Type of request, i.e. INSERT, DELETE, UPLOAD, etc."
+          description: Type of request, i.e. INSERT, DELETE, UPLOAD, etc.
           enum:
-            - INSERT
-            - DELETE
-            - STATUS
-            - FETCH
+          - INSERT
+          - DELETE
+          - STATUS
+          - FETCH
           type: string
         ADIF:
           description: ADIF formatted input data
@@ -59,35 +58,30 @@ components:
           description: A comma separated list of integer logid values
           type: string
       required:
-        - ACTION
-        - KEY
+      - ACTION
+      - KEY
       type: object
     Response:
       properties:
         RESULT:
-          description: |
-            OK when the operation succeeds, FAIL when the operation failed,
+          description: OK when the operation succeeds, FAIL when the operation failed,
             AUTH when API Access lacked sufficient privileges for the operation, or
             other action-specific codes
           type: string
         REASON:
-          description:
-            Used with RESULT=FAIL to describe the specific reason for failure
+          description: Used with RESULT=FAIL to describe the specific reason for failure
           type: string
         LOGIDS:
-          description:
-            A comma separated list of logid values that were affected by the
-            action
+          description: A comma separated list of logid values that were affected by
+            the action
           type: string
         LOGID:
-          description:
-            The logid value of the record that was inserted or replaced.
-            (Singular "LOGID" response only used by INSERT as it is a single
-            record operation.)
+          description: The logid value of the record that was inserted or replaced.
+            (Singular "LOGID" response only used by INSERT as it is a single record
+            operation.)
           type: string
         COUNT:
-          description:
-            The number of QSO records that were affected by the action
+          description: The number of QSO records that were affected by the action
           type: string
         DATA:
           description: Used for action-specific data such as status reports
