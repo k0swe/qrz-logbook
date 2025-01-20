@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   contact:
     email: flloyd@qrz.com
-  description:
+  description: |
     This API provides methods for external programs to interact with the QRZ
     Logbook using an HTTP REST interface. The QRZ Logbook is a combination free
     and paid subscription service of QRZ. Some advanced features require a valid
@@ -43,7 +43,7 @@ components:
           description: A QRZ supplied logbook access key
           type: string
         ACTION:
-          description: Type of request, i.e. INSERT, DELETE, UPLOAD, etc.
+          description: "Type of request, i.e. INSERT, DELETE, UPLOAD, etc."
           enum:
             - INSERT
             - DELETE
@@ -66,7 +66,7 @@ components:
     Response:
       properties:
         RESULT:
-          description:
+          description: |
             OK when the operation succeeds, FAIL when the operation failed, AUTH
             when API Access lacked sufficient privileges for the operation, or
             other action-specific codes
