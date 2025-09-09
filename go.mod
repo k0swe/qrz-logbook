@@ -2,7 +2,7 @@ module github.com/k0swe/qrz-logbook
 
 go 1.23.0
 
-toolchain go1.24.6
+toolchain go1.25.1
 
 require (
 	github.com/antihax/optional v1.0.0
