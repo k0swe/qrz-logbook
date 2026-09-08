@@ -25,7 +25,7 @@ func Fetch(ctx context.Context, key *string) (*FetchResponse, error) {
 		return nil, err
 	}
 	count, _ := strconv.ParseUint(apiResp.COUNT, 10, 64)
-	adif := strings.Replace(apiResp.DATA, "ADIF=", "", -1)
+	adif := strings.ReplaceAll(apiResp.DATA, "ADIF=", "")
 	adif = strings.ReplaceAll(adif, "&lt;", "<")
 	adif = strings.ReplaceAll(adif, "&gt;", ">")
 	r := FetchResponse{
