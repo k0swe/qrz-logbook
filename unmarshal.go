@@ -24,6 +24,6 @@ func findField(payload *string, regex *regexp.Regexp, field *string) {
 	submatch := regex.FindStringSubmatch(*payload)
 	if submatch != nil {
 		*field = submatch[2]
-		*payload = strings.Replace(*payload, submatch[0], "", -1)
+		*payload = strings.ReplaceAll(*payload, submatch[0], "")
 	}
 }
